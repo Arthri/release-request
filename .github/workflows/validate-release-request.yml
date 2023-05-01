@@ -24,7 +24,7 @@ jobs:
         env:
           RR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          if [[ ! $RR_TITLE =~ ^Release v[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?(-[a-zA-Z0-9_]+)?$ ]] ; then
+          if [[ ! $RR_TITLE =~ ^Release (v[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?(-[a-zA-Z0-9_]+)?)$ ]] ; then
             echo 'Exiting. Release request title does not match format `v<Major>.<Minor>[.<Patch>[.<Build>]][-<Suffix>]`.' | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
