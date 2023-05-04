@@ -1,0 +1,36 @@
+name: Prerelease Request
+description: Request the publication of a new prerelease.
+title: Prerelease vMajor.Minor.Patch[ | Release Name]
+labels: [ "release", "release:prerelease" ]
+assignees: []
+body:
+  - type: textarea
+    attributes:
+      label: Opening Remarks
+      description: A few remarks to open the announcement of a release.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Features
+      description: A list of new features present in the release.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Bug Fixes
+      description: A list of bugs fixed in the release.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Breaking Changes
+      description: A list of changes that break source and/or binary compatibility with previous releases.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Closing Remarks
+      description: A few remarks to close the announcement of a release.
+    validations:
+      required: false
