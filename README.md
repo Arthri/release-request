@@ -1,4 +1,4 @@
-# release-request
+# release_request
 A reusable workflow that introduces a new type of pull requests, "Release Requests", which create a new release when merged.
 
 ## Installation
@@ -21,7 +21,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release-request/.github/workflows/release_request.yml
+    uses: Arthri/release_request/.github/workflows/release_request.yml
 
 ```
 
@@ -71,7 +71,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release-request/.github/workflows/release_request.yml
+    uses: Arthri/release_request/.github/workflows/release_request.yml
     with:
       make_latest: true
 ```
@@ -84,7 +84,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release-request/.github/workflows/release_request.yml
+    uses: Arthri/release_request/.github/workflows/release_request.yml
     with:
       discussion_category_name: announcements
 ```
@@ -97,7 +97,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release-request/.github/workflows/release_request.yml
+    uses: Arthri/release_request/.github/workflows/release_request.yml
     with:
       generate_release_notes: true
 ```

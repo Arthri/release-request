@@ -13,4 +13,4 @@ jobs:
   update_tag:
     permissions:
       contents: write
-    uses: Arthri/update-major-tag/.github/workflows/update_major_tag.yml@v1
+    uses: Arthri/update_major_tag/.github/workflows/update_major_tag.yml@v1
