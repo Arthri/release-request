@@ -8,6 +8,11 @@ on:
         description: Specifies the name of the category to create a discussion in when the release is published.
         required: false
         type: string
+      draft:
+        default: true
+        description: If true, the release created will be drafted rather than published.
+        required: false
+        type: boolean
       generate_release_notes:
         default: false
         description: If true, the release name and notes will be generated if they were unspecified at the time of publish.
@@ -60,6 +65,7 @@ jobs:
       - name: Publish Release
         env:
           DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion_category_name && toJson(inputs.discussion_category_name) }}
+          DRAFT: ${{ inputs.draft && toJson(inputs.draft) }}
           GENERATE_RELEASE_NOTES: ${{ inputs.generate_release_notes && toJson(inputs.generate_release_notes) }}
           MAKE_LATEST: ${{ inputs.make_latest && toJson(inputs.make_latest) }}
           RELEASE_NOTES: ${{ github.event.pull_request.body && toJson(github.event.pull_request.body) }}
@@ -68,7 +74,7 @@ jobs:
           TARGET_COMMITISH: ${{ toJson(github.event.pull_request.head.ref) }}
         if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
         run: |
-          json_data='{'${RELEASE_NOTES:+'"body":'"$RELEASE_NOTES"','}${DISCUSSION_CATEGORY_NAME:+'"discussion_category_name":'"$DISCUSSION_CATEGORY_NAME"','}'"draft":false,'${GENERATE_RELEASE_NOTES:+'"generate_release_notes":'"$GENERATE_RELEASE_NOTES"','}${MAKE_LATEST:+'"make_latest":'"$MAKE_LATEST"','}${RELEASE_NAME:+'"name":'"$RELEASE_NAME"','}'"prerelease":${{ startsWith(github.event.pull_request.title, 'Pre') }},"tag_name":'"$RELEASE_TAG"',"target_commitish":'"$TARGET_COMMITISH"'}'
+          json_data='{'${RELEASE_NOTES:+'"body":'"$RELEASE_NOTES"','}${DISCUSSION_CATEGORY_NAME:+'"discussion_category_name":'"$DISCUSSION_CATEGORY_NAME"','}${DRAFT:+'"draft":'"$DRAFT"','}${GENERATE_RELEASE_NOTES:+'"generate_release_notes":'"$GENERATE_RELEASE_NOTES"','}${MAKE_LATEST:+'"make_latest":'"$MAKE_LATEST"','}${RELEASE_NAME:+'"name":'"$RELEASE_NAME"','}'"prerelease":${{ startsWith(github.event.pull_request.title, 'Pre') }},"tag_name":'"$RELEASE_TAG"',"target_commitish":'"$TARGET_COMMITISH"'}'
           echo "$json_data"
           curl --fail-with-body -L \
             -X POST \
