@@ -6,5 +6,6 @@ The default regex matches `Release v1.2`, `Release v1.2.3`, `Release v1.2.3.4`, 
 
 There a few places where this RegEx is used,
 - In all workflows in this repository.
+- README.md
 
 Any updates to the regex must be reflected on all the places it is used.
