@@ -3,8 +3,6 @@ run-name: |
   Update major tag: ${{ github.event_name }}${{ github.event_name == 'push' && (github.event.created && ' created' || ' deleted') || '' }} ${{ github.event.ref }}
 
 on:
-  create:
-
   delete:
 
   push:
