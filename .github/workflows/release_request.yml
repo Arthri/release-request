@@ -1,0 +1,79 @@
+name: Release Request
+
+on:
+  workflow_call:
+    inputs:
+      discussion_category_name:
+        default: ''
+        description: Specifies the name of the category to create a discussion in when the release is published.
+        required: false
+        type: string
+      generate_release_notes:
+        default: false
+        description: If true, the release name and notes will be generated if they were unspecified at the time of publish.
+        required: false
+        type: boolean
+      make_latest:
+        default: 'legacy'
+        description: Specifies how the latest release is determined. For more information, see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release.
+        required: false
+        type: string
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
+
+jobs:
+  publish_release_request:
+    if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
+    permissions:
+      contents: write
+    runs-on: ubuntu-22.04
+    timeout-minutes: 1
+
+    steps:
+      - name: Extract Information
+        run: |
+          if ${{ github.event.pull_request.author_association != 'OWNER' && github.event.pull_request.author_association != 'COLLABORATOR' }} ; then
+            echo 'Only collaborators or the repository owner may create release requests.'
+            exit 1
+          fi
+
+          if ${{ github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name }} ; then
+            echo 'Release requests'"'"' heads must be in the same repository as the bases.'
+            exit 1
+          fi
+
+          request_title_regex='^(Prer|R)elease (v[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?(-[a-zA-Z0-9_]+)?)( \| (.+))?$'
+
+          if [[ $RELEASE_REQUEST_TITLE =~ $request_title_regex ]] ; then
+            echo 'RELEASE_TAG='"${BASH_REMATCH[2]}" >> "$GITHUB_ENV"
+            echo 'RELEASE_NAME='"${BASH_REMATCH[7]}" >> "$GITHUB_ENV"
+          else
+            echo 'Release request'"'"'s title is not in the correct format.'
+            exit 1
+          fi
+
+      - name: Publish Release
+        env:
+          DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion_category_name && toJson(inputs.discussion_category_name) }}
+          GENERATE_RELEASE_NOTES: ${{ inputs.generate_release_notes && toJson(inputs.generate_release_notes) }}
+          MAKE_LATEST: ${{ inputs.make_latest && toJson(inputs.make_latest) }}
+          RELEASE_NOTES: ${{ github.event.pull_request.body && toJson(github.event.pull_request.body) }}
+          RELEASE_TAG: ${{ toJson(env.RELEASE_TAG) }}
+          RELEASE_NAME: ${{ env.RELEASE_NAME && toJson(env.RELEASE_NAME) }}
+          TARGET_COMMITISH: ${{ toJson(github.event.pull_request.head.ref) }}
+        if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+        run: |
+          json_data='{'${RELEASE_NOTES:+'"body":'"$RELEASE_NOTES"','}${DISCUSSION_CATEGORY_NAME:+'"discussion_category_name":'"$DISCUSSION_CATEGORY_NAME"','}'"draft":false,'${GENERATE_RELEASE_NOTES:+'"generate_release_notes":'"$GENERATE_RELEASE_NOTES"','}${MAKE_LATEST:+'"make_latest":'"$MAKE_LATEST"','}${RELEASE_NAME:+'"name":'"$RELEASE_NAME"','}'"prerelease":${{ startsWith(github.event.pull_request.title, 'Pre') }},"tag_name":'"$RELEASE_TAG"',"target_commitish":'"$TARGET_COMMITISH"'}'
+          echo "$json_data"
+          curl --fail-with-body -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d "$json_data"
