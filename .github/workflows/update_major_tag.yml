@@ -1,0 +1,16 @@
+name: Update v<Major> Tag
+run-name: |
+  Update major tag: ${{ github.event_name }}${{ github.event_name == 'push' && (github.event.created && ' created' || ' deleted') || '' }} ${{ github.event.ref }}
+
+on:
+  delete:
+
+  push:
+    tags:
+      - '**'
+
+jobs:
+  update_tag:
+    permissions:
+      contents: write
+    uses: Arthri/update-major-tag/.github/workflows/update_major_tag.yml@v1
