@@ -102,6 +102,19 @@ jobs:
       generate_release_notes: true
 ```
 
+### Publish Instead of Draft
+By default, the workflow drafts releases rather than outright publishing them to allow users to review the release before publishing, but also as a simple bypass to `$GITHUB_TOKEN` not being able to trigger other workflows. The behavior can be changed.
+```yml
+jobs:
+  publish_release_request:
+    name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
+    permissions:
+      contents: write
+    uses: Arthri/release_request/.github/workflows/release_request.yml
+    with:
+      draft: false
+```
+
 ## Limitations
 - Release requests cannot be made from another repository.
 - Release requests must be created by the repository's owner or collaborators.
