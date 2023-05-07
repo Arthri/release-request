@@ -21,7 +21,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release_request/.github/workflows/release_request.yml
+    uses: Arthri/release_request/.github/workflows/release_request.yml@v1
 
 ```
 
