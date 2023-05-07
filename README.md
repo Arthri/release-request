@@ -115,7 +115,7 @@ jobs:
       draft: false
 ```
 
-## Limitations
+### Limitations
 - Release requests cannot be made from another repository.
 - Release requests must be created by the repository's owner or collaborators.
 - The release request title format is not configurable.
