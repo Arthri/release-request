@@ -17,8 +17,8 @@ on:
       - release/**
 
 jobs:
-  publish_release_request:
-    name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
+  handle_release_request:
+    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
     uses: Arthri/release_request/.github/workflows/release_request.yml@v1
@@ -67,8 +67,8 @@ By default, the latest release is set by comparing version numbers(`legacy`). Th
 Here is an example of always setting new releases as the latest release.
 ```yml
 jobs:
-  publish_release_request:
-    name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
+  handle_release_request:
+    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
     uses: Arthri/release_request/.github/workflows/release_request.yml
@@ -80,8 +80,8 @@ jobs:
 The workflow can be configured to create a discussion when publishing a release, the workflow does not create a discussion by default but GitHub's default is creating a discussion in the `announcements` category.
 ```yml
 jobs:
-  publish_release_request:
-    name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
+  handle_release_request:
+    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
     uses: Arthri/release_request/.github/workflows/release_request.yml
@@ -93,8 +93,8 @@ jobs:
 The workflow does not allow GitHub to generate release notes for empty release names or notes by default. However, the workflow can be configured to allow GitHub to do so.
 ```yml
 jobs:
-  publish_release_request:
-    name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
+  handle_release_request:
+    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
     uses: Arthri/release_request/.github/workflows/release_request.yml
@@ -106,8 +106,8 @@ jobs:
 By default, the workflow drafts releases rather than outright publishing them to allow users to review the release before publishing, but also as a simple bypass to `$GITHUB_TOKEN` not being able to trigger other workflows. The behavior can be changed.
 ```yml
 jobs:
-  publish_release_request:
-    name: ${{ github.event.action == 'closed' && 'Publish ' || 'Verify ' }}Release Request
+  handle_release_request:
+    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
     uses: Arthri/release_request/.github/workflows/release_request.yml

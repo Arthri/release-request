@@ -32,7 +32,7 @@ env:
   RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
 
 jobs:
-  publish_release_request:
+  handle_release_request:
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
     permissions:
       contents: write
@@ -62,7 +62,7 @@ jobs:
             exit 1
           fi
 
-      - name: Publish Release
+      - name: Create Release
         env:
           DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion_category_name && toJson(inputs.discussion_category_name) }}
           DRAFT: ${{ inputs.draft && toJson(inputs.draft) }}
