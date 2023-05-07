@@ -8,7 +8,7 @@ on:
       - edited
       - opened
     branches:
-      - release/**
+      - master
 
 jobs:
   publish_release_request:
