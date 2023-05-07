@@ -32,7 +32,7 @@ env:
   RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
 
 jobs:
-  publish_release_request:
+  handle_release_request:
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
     permissions:
       contents: write
@@ -62,7 +62,7 @@ jobs:
             exit 1
           fi
 
-      - name: Publish Release
+      - name: Create Release
         env:
           DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion_category_name && toJson(inputs.discussion_category_name) }}
           DRAFT: ${{ inputs.draft && toJson(inputs.draft) }}
@@ -71,7 +71,7 @@ jobs:
           RELEASE_NOTES: ${{ github.event.pull_request.body && toJson(github.event.pull_request.body) }}
           RELEASE_TAG: ${{ toJson(env.RELEASE_TAG) }}
           RELEASE_NAME: ${{ env.RELEASE_NAME && toJson(env.RELEASE_NAME) }}
-          TARGET_COMMITISH: ${{ toJson(github.event.pull_request.head.ref) }}
+          TARGET_COMMITISH: ${{ toJson(github.event.pull_request.base.ref) }}
         if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
         run: |
           json_data='{'${RELEASE_NOTES:+'"body":'"$RELEASE_NOTES"','}${DISCUSSION_CATEGORY_NAME:+'"discussion_category_name":'"$DISCUSSION_CATEGORY_NAME"','}${DRAFT:+'"draft":'"$DRAFT"','}${GENERATE_RELEASE_NOTES:+'"generate_release_notes":'"$GENERATE_RELEASE_NOTES"','}${MAKE_LATEST:+'"make_latest":'"$MAKE_LATEST"','}${RELEASE_NAME:+'"name":'"$RELEASE_NAME"','}'"prerelease":${{ startsWith(github.event.pull_request.title, 'Pre') }},"tag_name":'"$RELEASE_TAG"',"target_commitish":'"$TARGET_COMMITISH"'}'
