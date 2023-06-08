@@ -23,6 +23,11 @@ on:
         description: Specifies how the latest release is determined. For more information, see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release.
         required: false
         type: string
+      release_request_label:
+        default: 'release'
+        description: The label that identifies release requests.
+        required: false
+        type: string
 
 defaults:
   run:
@@ -42,6 +47,12 @@ jobs:
     steps:
       - name: Extract Information
         run: |
+          if ${{ !contains(github.event.pull_request.labels.*.name, inputs.release_request_label) }} ; then
+            echo 'Skipping pull request, because it wasn'"'"'t labeled as release.'
+            echo 'STOP_JOB=true' >> "$GITHUB_ENV"
+            exit 0
+          fi
+
           if ${{ github.event.pull_request.author_association != 'OWNER' && github.event.pull_request.author_association != 'COLLABORATOR' }} ; then
             echo 'Only collaborators or the repository owner may create release requests.'
             exit 1
@@ -72,7 +83,7 @@ jobs:
           RELEASE_TAG: ${{ toJson(env.RELEASE_TAG) }}
           RELEASE_NAME: ${{ env.RELEASE_NAME && toJson(env.RELEASE_NAME) }}
           TARGET_COMMITISH: ${{ toJson(github.event.pull_request.base.ref) }}
-        if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+        if: ${{ env.STOP_JOB != 'true' && github.event.action == 'closed' && github.event.pull_request.merged }}
         run: |
           json_data='{'${RELEASE_NOTES:+'"body":'"$RELEASE_NOTES"','}${DISCUSSION_CATEGORY_NAME:+'"discussion_category_name":'"$DISCUSSION_CATEGORY_NAME"','}${DRAFT:+'"draft":'"$DRAFT"','}${GENERATE_RELEASE_NOTES:+'"generate_release_notes":'"$GENERATE_RELEASE_NOTES"','}${MAKE_LATEST:+'"make_latest":'"$MAKE_LATEST"','}${RELEASE_NAME:+'"name":'"$RELEASE_NAME"','}'"prerelease":${{ startsWith(github.event.pull_request.title, 'Pre') }},"tag_name":'"$RELEASE_TAG"',"target_commitish":'"$TARGET_COMMITISH"'}'
           echo "$json_data"

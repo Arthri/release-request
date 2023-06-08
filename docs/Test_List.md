@@ -92,4 +92,8 @@ A list of steps for testing the workflow's features.
 1. Merge a release request with a body, or find a merged release request with a body.
 
 ### Outputs
-1. A release request in the correct format. The release tag should be correct, everything after `|` should be the release's title, and the release's notes should match the release request's contents.
+1. A release in the correct format.
+    - The release's tag should be correct.
+    - Everything after ` | ` in the release request's title should be the release's title.
+    - The release's notes should exactly match the release request's contents.
+    - The release's target commitish should be the release request's base or destination branch.
