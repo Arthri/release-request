@@ -56,7 +56,9 @@ on:
     types:
       - closed
       - edited
+      - labeled
       - opened
+      - unlabeled
     branches:
       - release/nuget
       - staging/**
