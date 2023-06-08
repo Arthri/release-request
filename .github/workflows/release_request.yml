@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Extract Information
         run: |
-          if ${{ contains(github.event.pull_request.labels.*.name, inputs.release_request_label) }} ; then
+          if ${{ !contains(github.event.pull_request.labels.*.name, inputs.release_request_label) }} ; then
             echo 'Skipping pull request, because it wasn't labeled as release.'
             echo 'STOP_JOB=true' >> "$GITHUB_ENV"
             exit 0
