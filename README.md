@@ -42,6 +42,7 @@ Release requests' contents do not currently have a format. Any format is valid.
 
 ## Usage
 1. Create a new pull request with a valid title to any branch that begins with `release/`.
+1. Label the pull request with "release".
 1. Merge pull request.
 1. Expect workflow to run and a new release to be created.
 
@@ -113,6 +114,19 @@ jobs:
     uses: Arthri/release_request/.github/workflows/release_request.yml
     with:
       draft: false
+```
+
+### Custom Release Request Label
+Only pull requests with the labeled with `release` are considered release requests. The label can be changed, but only one label can be specified.
+```yml
+jobs:
+  handle_release_request:
+    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
+    permissions:
+      contents: write
+    uses: Arthri/release_request/.github/workflows/release_request.yml
+    with:
+      release_request_label: custom_label
 ```
 
 ### Limitations
