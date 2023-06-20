@@ -1,4 +1,4 @@
-# release_request
+# release-request
 A reusable workflow that introduces a new type of pull requests, "Release Requests", which create a new release when merged.
 
 ## Installation
@@ -19,11 +19,11 @@ on:
       - release/**
 
 jobs:
-  handle_release_request:
+  handle-release-request:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release_request/.github/workflows/release_request.yml@v1
+    uses: Arthri/release-request/.github/workflows/release-request.yml@v1
 
 ```
 
@@ -72,50 +72,50 @@ By default, the latest release is set by comparing version numbers(`legacy`). Th
 Here is an example of always setting new releases as the latest release.
 ```yml
 jobs:
-  handle_release_request:
+  handle-release-request:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release_request/.github/workflows/release_request.yml
+    uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
-      make_latest: true
+      make-latest: true
 ```
 
 ### Discussion Name
 The workflow can be configured to create a discussion when publishing a release, the workflow does not create a discussion by default but GitHub's default is creating a discussion in the `announcements` category.
 ```yml
 jobs:
-  handle_release_request:
+  handle-release-request:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release_request/.github/workflows/release_request.yml
+    uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
-      discussion_category_name: announcements
+      discussion-category-name: announcements
 ```
 
 ### Generate Release Notes
 The workflow does not allow GitHub to generate release notes for empty release names or notes by default. However, the workflow can be configured to allow GitHub to do so.
 ```yml
 jobs:
-  handle_release_request:
+  handle-release-request:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release_request/.github/workflows/release_request.yml
+    uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
-      generate_release_notes: true
+      generate-release-notes: true
 ```
 
 ### Publish Instead of Draft
 By default, the workflow drafts releases rather than outright publishing them to allow users to review the release before publishing, but also as a simple bypass to `$GITHUB_TOKEN` not being able to trigger other workflows. The behavior can be changed.
 ```yml
 jobs:
-  handle_release_request:
+  handle-release-request:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release_request/.github/workflows/release_request.yml
+    uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       draft: false
 ```
@@ -124,13 +124,13 @@ jobs:
 Only pull requests with the labeled with `release` are considered release requests. The label can be changed, but only one label can be specified.
 ```yml
 jobs:
-  handle_release_request:
+  handle-release-request:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: Arthri/release_request/.github/workflows/release_request.yml
+    uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
-      release_request_label: custom_label
+      release-request-label: custom-label
 ```
 
 ### Limitations

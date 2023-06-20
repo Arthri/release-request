@@ -13,8 +13,8 @@ on:
       - master
 
 jobs:
-  handle_release_request:
+  handle-release-request:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
-    uses: ./.github/workflows/release_request.yml
+    uses: ./.github/workflows/release-request.yml
