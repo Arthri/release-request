@@ -3,7 +3,7 @@ name: Release Request
 on:
   workflow_call:
     inputs:
-      discussion_category_name:
+      discussion-category-name:
         default: ''
         description: Specifies the name of the category to create a discussion in when the release is published.
         required: false
@@ -13,17 +13,17 @@ on:
         description: If true, the release created will be drafted rather than published.
         required: false
         type: boolean
-      generate_release_notes:
+      generate-release-notes:
         default: false
         description: If true, the release name and notes will be generated if they were unspecified at the time of publish.
         required: false
         type: boolean
-      make_latest:
+      make-latest:
         default: 'legacy'
         description: Specifies how the latest release is determined. For more information, see https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release.
         required: false
         type: string
-      release_request_label:
+      release-request-label:
         default: 'release'
         description: The label that identifies release requests.
         required: false
@@ -37,7 +37,7 @@ env:
   RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
 
 jobs:
-  handle_release_request:
+  handle-release-request:
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
     permissions:
       contents: write
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Extract Information
         run: |
-          if ${{ !contains(github.event.pull_request.labels.*.name, inputs.release_request_label) }} ; then
+          if ${{ !contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }} ; then
             echo 'Skipping pull request, because it wasn'"'"'t labeled as release.'
             echo 'STOP_JOB=true' >> "$GITHUB_ENV"
             exit 0
@@ -75,10 +75,10 @@ jobs:
 
       - name: Create Release
         env:
-          DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion_category_name && toJson(inputs.discussion_category_name) }}
+          DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion-category-name && toJson(inputs.discussion-category-name) }}
           DRAFT: ${{ inputs.draft && toJson(inputs.draft) }}
-          GENERATE_RELEASE_NOTES: ${{ inputs.generate_release_notes && toJson(inputs.generate_release_notes) }}
-          MAKE_LATEST: ${{ inputs.make_latest && toJson(inputs.make_latest) }}
+          GENERATE_RELEASE_NOTES: ${{ inputs.generate-release-notes && toJson(inputs.generate-release-notes) }}
+          MAKE_LATEST: ${{ inputs.make-latest && toJson(inputs.make-latest) }}
           RELEASE_NOTES: ${{ github.event.pull_request.body && toJson(github.event.pull_request.body) }}
           RELEASE_TAG: ${{ toJson(env.RELEASE_TAG) }}
           RELEASE_NAME: ${{ env.RELEASE_NAME && toJson(env.RELEASE_NAME) }}
