@@ -86,7 +86,11 @@ jobs:
             || response_status=$?
 
           if [ "$response_status" -ne 404 ] ; then
-            echo "Unexpected response status $response_status"
+            if [ "$response_status" -eq 200 ] ; then
+              echo "Tag $RELEASE_TAG already exists."
+            else
+              echo "Unexpected response status $response_status."
+            fi
             exit 1
           fi
 
