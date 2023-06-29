@@ -97,3 +97,12 @@ A list of steps for testing the workflow's features.
     - Everything after ` | ` in the release request's title should be the release's title.
     - The release's notes should exactly match the release request's contents.
     - The release's target commitish should be the release request's base or destination branch.
+
+## Action fails on release requests for existing tags
+
+### Steps
+1. Create a release request set to an existing tag.
+
+### Output
+1. Workflow triggers.
+1. Workflow fails.
