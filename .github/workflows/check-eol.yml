@@ -1,5 +1,5 @@
-name: Check End-of-Line Sequence
-run-name: Check End-of-Line Sequence
+name: Check End-of-Line Sequences
+run-name: Check End-of-Line Sequences
 
 on:
   push:
