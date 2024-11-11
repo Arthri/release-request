@@ -2,6 +2,11 @@
     Prerelease Description
 -->
 
+## ❗ Breaking Changes
+<!--
+- `API.SendRequest` has been rewritten and its parameters have changed
+-->
+
 ## 🆕 Features
 <!-- 
 - Added this
@@ -13,9 +18,4 @@
 - Fixed this
 - Fixed that
 - Fixed all of them
--->
-
-## ❗ Breaking Changes
-<!--
-- `API.SendRequest` has been rewritten and its parameters have changed
 -->
