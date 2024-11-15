@@ -28,6 +28,13 @@ on:
         description: The label that identifies release requests.
         required: false
         type: string
+    outputs:
+      release-tag:
+        description: The tag of the release.
+        value: ${{ jobs.handle-release-request.outputs.release-tag }}
+      release-title:
+        description: The title of the release.
+        value: ${{ jobs.handle-release-request.outputs.release-title }}
 
 defaults:
   run:
@@ -39,6 +46,9 @@ env:
 jobs:
   handle-release-request:
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
+    outputs:
+      release-tag: ${{ steps.extract.outputs.release-tag }}
+      release-title: ${{ steps.extract.outputs.release-title }}
     permissions:
       contents: write
     runs-on: ubuntu-22.04
@@ -71,8 +81,8 @@ jobs:
           request_title_regex='^(Prer|R)elease (v[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?(-[a-zA-Z0-9_]+)?)( \| (.+))?$'
 
           if [[ $RELEASE_REQUEST_TITLE =~ $request_title_regex ]] ; then
-            echo 'RELEASE_TAG='"${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
-            echo 'RELEASE_TITLE='"${BASH_REMATCH[7]}" >> "$GITHUB_OUTPUT"
+            echo 'release-tag='"${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+            echo 'release-title='"${BASH_REMATCH[7]}" >> "$GITHUB_OUTPUT"
           else
             echo 'Release request'"'"'s title is not in the correct format.'
             exit 1
@@ -82,7 +92,7 @@ jobs:
         if: ${{ env.STOP_JOB != 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ steps.extract.outputs.RELEASE_TAG }}
+          RELEASE_TAG: ${{ steps.extract.outputs.release-tag }}
         run: |
           response_status="$(gh api -i -X HEAD \
             -H 'Accept: application/vnd.github+json' \
@@ -111,8 +121,8 @@ jobs:
           MAKE_LATEST: ${{ inputs.make-latest }}
           MAKE_PRERELEASE: ${{ startsWith(github.event.pull_request.title, 'Pre') }}
           RELEASE_NOTES: ${{ github.event.pull_request.body }}
-          RELEASE_TAG: ${{ steps.extract.outputs.RELEASE_TAG }}
-          RELEASE_TITLE: ${{ steps.extract.outputs.RELEASE_TITLE }}
+          RELEASE_TAG: ${{ steps.extract.outputs.release-tag }}
+          RELEASE_TITLE: ${{ steps.extract.outputs.release-title }}
           RELEASE_TARGET: ${{ github.event.pull_request.base.ref }}
         run: |
           RELEASE_ARGUMENTS=('-R' "$GITHUB_REPOSITORY" '--target' "$RELEASE_TARGET")
