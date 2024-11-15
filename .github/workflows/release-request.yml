@@ -46,6 +46,7 @@ jobs:
 
     steps:
       - name: Extract Information
+        id: extract
         run: |
           if ${{ !contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }} ; then
             echo 'Skipping pull request, because it wasn'"'"'t labeled as release.'
@@ -66,8 +67,8 @@ jobs:
           request_title_regex='^(Prer|R)elease (v[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?(-[a-zA-Z0-9_]+)?)( \| (.+))?$'
 
           if [[ $RELEASE_REQUEST_TITLE =~ $request_title_regex ]] ; then
-            echo 'RELEASE_TAG='"${BASH_REMATCH[2]}" >> "$GITHUB_ENV"
-            echo 'RELEASE_NAME='"${BASH_REMATCH[7]}" >> "$GITHUB_ENV"
+            echo 'RELEASE_TAG='"${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+            echo 'RELEASE_TITLE='"${BASH_REMATCH[7]}" >> "$GITHUB_OUTPUT"
           else
             echo 'Release request'"'"'s title is not in the correct format.'
             exit 1
@@ -75,6 +76,8 @@ jobs:
 
       - name: Get Release Status
         if: ${{ env.STOP_JOB != 'true' }}
+        env:
+          RELEASE_TAG: ${{ steps.extract.outputs.RELEASE_TAG }}
         run: |
           response_status=$(curl -I -L -s -o /dev/null -w "%{http_code}" \
             -H "Accept: application/vnd.github+json" \
@@ -92,23 +95,45 @@ jobs:
           fi
 
       - name: Create Release
-        env:
-          DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion-category-name && toJson(inputs.discussion-category-name) }}
-          DRAFT: ${{ inputs.draft && toJson(inputs.draft) }}
-          GENERATE_RELEASE_NOTES: ${{ inputs.generate-release-notes && toJson(inputs.generate-release-notes) }}
-          MAKE_LATEST: ${{ inputs.make-latest && toJson(inputs.make-latest) }}
-          RELEASE_NOTES: ${{ github.event.pull_request.body && toJson(github.event.pull_request.body) }}
-          RELEASE_TAG: ${{ toJson(env.RELEASE_TAG) }}
-          RELEASE_NAME: ${{ env.RELEASE_NAME && toJson(env.RELEASE_NAME) }}
-          TARGET_COMMITISH: ${{ toJson(github.event.pull_request.base.ref) }}
         if: ${{ env.STOP_JOB != 'true' && github.event.action == 'closed' && github.event.pull_request.merged }}
+        env:
+          DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion-category-name }}
+          GENERATE_RELEASE_NOTES: ${{ inputs.generate-release-notes }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAKE_DRAFT: ${{ inputs.draft }}
+          MAKE_LATEST: ${{ inputs.make-latest }}
+          MAKE_PRERELEASE: ${{ startsWith(github.event.pull_request.title, 'Pre') }}
+          RELEASE_NOTES: ${{ github.event.pull_request.body }}
+          RELEASE_TAG: ${{ steps.extract.outputs.RELEASE_TAG }}
+          RELEASE_TITLE: ${{ steps.extract.outputs.RELEASE_TITLE }}
+          RELEASE_TARGET: ${{ github.event.pull_request.base.ref }}
         run: |
-          json_data='{'${RELEASE_NOTES:+'"body":'"$RELEASE_NOTES"','}${DISCUSSION_CATEGORY_NAME:+'"discussion_category_name":'"$DISCUSSION_CATEGORY_NAME"','}${DRAFT:+'"draft":'"$DRAFT"','}${GENERATE_RELEASE_NOTES:+'"generate_release_notes":'"$GENERATE_RELEASE_NOTES"','}${MAKE_LATEST:+'"make_latest":'"$MAKE_LATEST"','}${RELEASE_NAME:+'"name":'"$RELEASE_NAME"','}'"prerelease":${{ startsWith(github.event.pull_request.title, 'Pre') }},"tag_name":'"$RELEASE_TAG"',"target_commitish":'"$TARGET_COMMITISH"'}'
-          echo "$json_data"
-          curl --fail-with-body -L \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${{ github.repository }}/releases \
-            -d "$json_data"
+          RELEASE_ARGUMENTS=('-R' "$GITHUB_REPOSITORY" '--target' "$RELEASE_TARGET")
+
+          if [[ -v $RELEASE_TITLE ]] ; then
+            RELEASE_ARGUMENTS+=('-t' "$RELEASE_TITLE")
+          fi
+
+          if [[ -v $RELEASE_NOTES ]] ; then
+            RELEASE_ARGUMENTS+=('-n' "$RELEASE_NOTES")
+          fi
+
+          if [[ -v $DISCUSSION_CATEGORY_NAME ]] ; then
+            RELEASE_ARGUMENTS+=('--discussion-category' "$DISCUSSION_CATEGORY_NAME")
+          fi
+
+          if [[ $MAKE_DRAFT == 'true' ]] ; then
+            RELEASE_ARGUMENTS+=('-d')
+          fi
+
+          if [[ $GENERATE_RELEASE_NOTES == 'true' ]] ; then
+            RELEASE_ARGUMENTS+=('--generate-notes')
+          fi
+
+          if [[ $MAKE_PRERELEASE == 'true' ]] ; then
+            RELEASE_ARGUMENTS+=('-p')
+          elif [[ $MAKE_LATEST == 'true' ]] ; then
+            RELEASE_ARGUMENTS+=('--latest')
+          fi
+
+          gh release create "$RELEASE_TAG" "${RELEASE_ARGUMENTS[@]}"
