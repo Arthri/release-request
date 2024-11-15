@@ -47,19 +47,23 @@ jobs:
     steps:
       - name: Extract Information
         id: extract
+        env:
+          IS_RELEASE_REQUEST: ${{ contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }}
+          IS_ACTOR_AUTHORIZED: ${{ github.event.pull_request.author_association == 'OWNER' || github.event.pull_request.author_association == 'COLLABORATOR' }}
+          IS_EXTERNAL_REQUEST: ${{ github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name }}
         run: |
-          if ${{ !contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }} ; then
+          if [[ $IS_RELEASE_REQUEST != 'true' ]] ; then
             echo 'Skipping pull request, because it wasn'"'"'t labeled as release.'
             echo 'STOP_JOB=true' >> "$GITHUB_ENV"
             exit 0
           fi
 
-          if ${{ github.event.pull_request.author_association != 'OWNER' && github.event.pull_request.author_association != 'COLLABORATOR' }} ; then
+          if [[ $IS_ACTOR_AUTHORIZED != 'true' ]] ; then
             echo 'Only collaborators or the repository owner may create release requests.'
             exit 1
           fi
 
-          if ${{ github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name }} ; then
+          if [[ $IS_EXTERNAL_REQUEST == 'true' ]] ; then
             echo 'Release requests'"'"' heads must be in the same repository as the bases.'
             exit 1
           fi
