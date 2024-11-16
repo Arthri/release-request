@@ -41,7 +41,8 @@ defaults:
     shell: bash
 
 jobs:
-  handle-release-request:
+  process:
+    name: ${{ github.event.action == 'closed' && 'Resolve' || 'Verify' }}
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
     outputs:
       release-tag: ${{ steps.extract.outputs.release-tag }}
@@ -102,27 +103,20 @@ jobs:
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           RELEASE_TAG: ${{ steps.extract.outputs.release-tag }}
         run: |
-          response_status="$(gh api -i -X HEAD \
+          status_code="$(curl -ILs -o /dev/null -w '%{http_code}' \
             -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer $GH_TOKEN" \
             -H 'X-GitHub-Api-Version: 2022-11-28' \
-            "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" |
-            head -n1 |
-            sed 's/^HTTP\/[0-9.]\+ //' ; \
-            EXIT_CODE=$? ; \
-            if [[ $EXIT_CODE -eq 141 ]] ; then \
-              exit 0 ; \
-            else \
-              exit "$EXIT_CODE" ; \
-            fi
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG"
           )"
 
-          if [[ $response_status != '404 Not Found' ]] ; then
-            if [[ $response_status == '200 OK' ]] ; then
+          if [[ $status_code -ne 404 ]] ; then
+            if [[ $status_code -eq 200 ]] ; then
               message='A release for the tag "'"$RELEASE_TAG"'" already exists.'
               echo "$message"
               gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             else
-              echo "Unexpected response status $response_status."
+              echo "Unexpected status code $status_code."
             fi
             exit 1
           fi
