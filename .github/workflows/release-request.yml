@@ -31,10 +31,10 @@ on:
     outputs:
       release-tag:
         description: The tag of the release.
-        value: ${{ jobs.handle-release-request.outputs.release-tag }}
+        value: ${{ jobs.process.outputs.release-tag }}
       release-title:
         description: The title of the release.
-        value: ${{ jobs.handle-release-request.outputs.release-title }}
+        value: ${{ jobs.process.outputs.release-title }}
 
 defaults:
   run:
