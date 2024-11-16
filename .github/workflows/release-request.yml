@@ -40,9 +40,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
-
 jobs:
   handle-release-request:
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
@@ -61,6 +58,7 @@ jobs:
           IS_RELEASE_REQUEST: ${{ contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }}
           IS_ACTOR_AUTHORIZED: ${{ github.event.pull_request.author_association == 'OWNER' || github.event.pull_request.author_association == 'COLLABORATOR' }}
           IS_EXTERNAL_REQUEST: ${{ github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name }}
+          RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
         run: |
           if [[ $IS_RELEASE_REQUEST != 'true' ]] ; then
             echo 'Skipping pull request, because it wasn'"'"'t labeled as release.'
