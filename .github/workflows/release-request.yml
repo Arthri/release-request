@@ -147,8 +147,8 @@ jobs:
 
           if [[ $MAKE_PRERELEASE == 'true' ]] ; then
             RELEASE_ARGUMENTS+=('-p')
-          elif [[ $MAKE_LATEST == 'true' ]] ; then
-            RELEASE_ARGUMENTS+=('--latest')
+          elif [[ $MAKE_LATEST != 'legacy' ]] ; then
+            RELEASE_ARGUMENTS+=('--latest='"$MAKE_LATEST")
           fi
 
           gh release create "$RELEASE_TAG" "${RELEASE_ARGUMENTS[@]}"
