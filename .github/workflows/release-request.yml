@@ -102,7 +102,7 @@ jobs:
 
           if [[ $status_code -ne 404 ]] ; then
             if [[ $status_code -eq 200 ]] ; then
-              echo "$RELEASE_TAG already exists."
+              echo 'A release for the tag "'"$RELEASE_TAG"'" already exists.'
             else
               echo "Unexpected status code $status_code."
             fi
