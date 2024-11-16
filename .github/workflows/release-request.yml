@@ -43,7 +43,7 @@ defaults:
 jobs:
   process:
     name: ${{ github.event.action == 'closed' && 'Resolve' || 'Verify' }}
-    if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, inputs.release-request-label) && (github.event.action != 'closed' || github.event.pull_request.merged) }}
     outputs:
       release-tag: ${{ steps.extract.outputs.release-tag }}
       release-title: ${{ steps.extract.outputs.release-title }}
@@ -56,17 +56,10 @@ jobs:
       - name: Extract Information
         id: extract
         env:
-          IS_RELEASE_REQUEST: ${{ contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }}
           IS_ACTOR_AUTHORIZED: ${{ github.event.pull_request.author_association == 'OWNER' || github.event.pull_request.author_association == 'COLLABORATOR' }}
           IS_EXTERNAL_REQUEST: ${{ github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name }}
           RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          if [[ $IS_RELEASE_REQUEST != 'true' ]] ; then
-            echo 'Skipping pull request, because it wasn'"'"'t labeled as release.'
-            echo 'STOP_JOB=true' >> "$GITHUB_ENV"
-            exit 0
-          fi
-
           if [[ $IS_ACTOR_AUTHORIZED != 'true' ]] ; then
             echo 'Only collaborators or the repository owner may create release requests.'
             exit 1
@@ -88,7 +81,6 @@ jobs:
           fi
 
       - name: Get Release Status
-        if: ${{ env.STOP_JOB != 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ steps.extract.outputs.release-tag }}
@@ -110,7 +102,7 @@ jobs:
           fi
 
       - name: Create Release
-        if: ${{ env.STOP_JOB != 'true' && github.event.action == 'closed' && github.event.pull_request.merged }}
+        if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
         env:
           DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion-category-name }}
           GENERATE_RELEASE_NOTES: ${{ inputs.generate-release-notes }}
