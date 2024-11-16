@@ -42,6 +42,7 @@ defaults:
 
 jobs:
   handle-release-request:
+    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
     outputs:
       release-tag: ${{ steps.extract.outputs.release-tag }}
