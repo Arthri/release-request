@@ -125,15 +125,15 @@ jobs:
         run: |
           RELEASE_ARGUMENTS=('-R' "$GITHUB_REPOSITORY" '--target' "$RELEASE_TARGET")
 
-          if [[ -v RELEASE_TITLE ]] ; then
+          if [[ -n $RELEASE_TITLE ]] ; then
             RELEASE_ARGUMENTS+=('-t' "$RELEASE_TITLE")
           fi
 
-          if [[ -v RELEASE_NOTES ]] ; then
+          if [[ -n $RELEASE_NOTES ]] ; then
             RELEASE_ARGUMENTS+=('-n' "$RELEASE_NOTES")
           fi
 
-          if [[ -v DISCUSSION_CATEGORY_NAME ]] ; then
+          if [[ -n $DISCUSSION_CATEGORY_NAME ]] ; then
             RELEASE_ARGUMENTS+=('--discussion-category' "$DISCUSSION_CATEGORY_NAME")
           fi
 
@@ -147,7 +147,7 @@ jobs:
 
           if [[ $MAKE_PRERELEASE == 'true' ]] ; then
             RELEASE_ARGUMENTS+=('-p')
-          elif [[ $MAKE_LATEST != 'legacy' ]] ; then
+          elif [[ $MAKE_LATEST != 'legacy' && -n $MAKE_LATEST ]] ; then
             RELEASE_ARGUMENTS+=('--latest='"$MAKE_LATEST")
           fi
 
