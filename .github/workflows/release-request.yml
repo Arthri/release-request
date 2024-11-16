@@ -31,10 +31,10 @@ on:
     outputs:
       release-tag:
         description: The tag of the release.
-        value: ${{ jobs.handle-release-request.outputs.release-tag }}
+        value: ${{ jobs.handle.outputs.release-tag }}
       release-title:
         description: The title of the release.
-        value: ${{ jobs.handle-release-request.outputs.release-title }}
+        value: ${{ jobs.handle.outputs.release-title }}
 
 defaults:
   run:
@@ -43,7 +43,7 @@ defaults:
 jobs:
   handle:
     name: ${{ github.event.action == 'closed' && 'Resolve' || 'Verify' }}
-    if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, inputs.release-request-label) && (github.event.action != 'closed' || github.event.pull_request.merged) }}
     outputs:
       release-tag: ${{ steps.extract.outputs.release-tag }}
       release-title: ${{ steps.extract.outputs.release-title }}
@@ -58,18 +58,11 @@ jobs:
         id: extract
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          IS_RELEASE_REQUEST: ${{ contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }}
           IS_ACTOR_AUTHORIZED: ${{ github.event.pull_request.author_association == 'OWNER' || github.event.pull_request.author_association == 'COLLABORATOR' }}
           IS_EXTERNAL_REQUEST: ${{ github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name }}
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          if [[ $IS_RELEASE_REQUEST != 'true' ]] ; then
-            echo 'Skipping pull request, because it wasn'"'"'t labeled as release.'
-            echo 'STOP_JOB=true' >> "$GITHUB_ENV"
-            exit 0
-          fi
-
           if [[ $IS_ACTOR_AUTHORIZED != 'true' ]] ; then
             message='Only collaborators or the repository owner may create release requests.'
             echo "$message"
@@ -97,7 +90,6 @@ jobs:
           fi
 
       - name: Get Release Status
-        if: ${{ env.STOP_JOB != 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
@@ -122,7 +114,7 @@ jobs:
           fi
 
       - name: Create Release
-        if: ${{ env.STOP_JOB != 'true' && github.event.action == 'closed' && github.event.pull_request.merged }}
+        if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
         env:
           DISCUSSION_CATEGORY_NAME: ${{ inputs.discussion-category-name }}
           GENERATE_RELEASE_NOTES: ${{ inputs.generate-release-notes }}
