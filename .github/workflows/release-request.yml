@@ -101,7 +101,7 @@ jobs:
           )"
 
           if [[ $response_status != '404 Not Found' ]] ; then
-            if [[ $response_status != '200 OK' ]] ; then
+            if [[ $response_status == '200 OK' ]] ; then
               echo "$RELEASE_TAG already exists."
             else
               echo "Unexpected response status $response_status."
