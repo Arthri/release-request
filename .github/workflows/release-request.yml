@@ -125,15 +125,15 @@ jobs:
         run: |
           RELEASE_ARGUMENTS=('-R' "$GITHUB_REPOSITORY" '--target' "$RELEASE_TARGET")
 
-          if [[ -v $RELEASE_TITLE ]] ; then
+          if [[ -v RELEASE_TITLE ]] ; then
             RELEASE_ARGUMENTS+=('-t' "$RELEASE_TITLE")
           fi
 
-          if [[ -v $RELEASE_NOTES ]] ; then
+          if [[ -v RELEASE_NOTES ]] ; then
             RELEASE_ARGUMENTS+=('-n' "$RELEASE_NOTES")
           fi
 
-          if [[ -v $DISCUSSION_CATEGORY_NAME ]] ; then
+          if [[ -v DISCUSSION_CATEGORY_NAME ]] ; then
             RELEASE_ARGUMENTS+=('--discussion-category' "$DISCUSSION_CATEGORY_NAME")
           fi
 
