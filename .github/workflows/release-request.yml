@@ -43,7 +43,7 @@ defaults:
 jobs:
   process:
     name: ${{ github.event.action == 'closed' && 'Resolve' || 'Verify' }}
-    if: ${{ contains(github.event.pull_request.labels.*.name, inputs.release-request-label) && (github.event.action != 'closed' || github.event.pull_request.merged) }}
+    if: ${{ (github.event.pull_request.state != 'closed' || github.event.action == 'closed' && github.event.pull_request.merged) && contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }}
     outputs:
       release-tag: ${{ steps.extract.outputs.release-tag }}
       release-title: ${{ steps.extract.outputs.release-title }}
