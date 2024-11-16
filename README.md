@@ -23,6 +23,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml@v1
 
 ```
@@ -76,6 +77,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       make-latest: true
@@ -89,6 +91,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       discussion-category-name: announcements
@@ -102,6 +105,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       generate-release-notes: true
@@ -115,6 +119,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       draft: false
@@ -128,6 +133,7 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       release-request-label: custom-label

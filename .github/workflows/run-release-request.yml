@@ -17,4 +17,5 @@ jobs:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: ./.github/workflows/release-request.yml
