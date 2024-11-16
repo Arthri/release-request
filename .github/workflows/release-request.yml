@@ -41,7 +41,7 @@ defaults:
     shell: bash
 
 jobs:
-  process:
+  handle:
     name: ${{ github.event.action == 'closed' && 'Resolve' || 'Verify' }}
     if: ${{ github.event.action != 'closed' || github.event.pull_request.merged }}
     outputs:
