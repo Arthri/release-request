@@ -5,7 +5,6 @@ A reusable workflow that introduces a new type of pull requests, "Release Reques
 Add a new workflow under `.github/workflows/` with the following contents.
 ```yml
 name: Release Request
-run-name: Release Request
 
 on:
   pull_request:
@@ -20,7 +19,6 @@ on:
 
 jobs:
   handle:
-    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
       pull-requests: write
