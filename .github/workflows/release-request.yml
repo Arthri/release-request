@@ -71,7 +71,7 @@ jobs:
           fi
 
           if [[ $IS_EXTERNAL_REQUEST == 'true' ]] ; then
-            message='Release requests'"'"' head branches must be in the same repository as the base branches.'
+            message="Release requests' head branches must be in the same repository as the base branches."
             echo "::error::$message"
             gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             exit 1
