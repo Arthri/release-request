@@ -65,14 +65,14 @@ jobs:
         run: |
           if [[ $IS_ACTOR_AUTHORIZED != 'true' ]] ; then
             message='Only collaborators or the repository owner may create release requests.'
-            echo "$message"
+            echo "::error::$message"
             gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             exit 1
           fi
 
           if [[ $IS_EXTERNAL_REQUEST == 'true' ]] ; then
             message='Release requests'"'"' head branches must be in the same repository as the base branches.'
-            echo "$message"
+            echo "::error::$message"
             gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             exit 1
           fi
@@ -84,7 +84,7 @@ jobs:
             echo 'release-title='"${BASH_REMATCH[7]}" >> "$GITHUB_OUTPUT"
           else
             message='The release request'"'"'s title is not in the correct format.'
-            echo "$message"
+            echo "::error::$message"
             gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             exit 1
           fi
@@ -105,10 +105,10 @@ jobs:
           if [[ $status_code -ne 404 ]] ; then
             if [[ $status_code -eq 200 ]] ; then
               message='A release for the tag "'"$RELEASE_TAG"'" already exists.'
-              echo "$message"
+              echo "::error::$message"
               gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             else
-              echo "Unexpected status code $status_code."
+              echo "::error::Unexpected status code $status_code."
             fi
             exit 1
           fi
