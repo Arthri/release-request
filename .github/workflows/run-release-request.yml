@@ -1,5 +1,4 @@
 name: Release Request
-run-name: Release Request
 
 on:
   pull_request:
