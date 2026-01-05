@@ -18,9 +18,10 @@ on:
       - release/**
 
 jobs:
-  process:
+  handle:
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml@v1
 
 ```
@@ -70,10 +71,11 @@ By default, the latest release is set by comparing version numbers(`legacy`). Th
 Here is an example of always setting new releases as the latest release.
 ```yml
 jobs:
-  process:
+  handle:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       make-latest: true
@@ -83,10 +85,11 @@ jobs:
 The workflow can be configured to create a discussion when publishing a release, the workflow does not create a discussion by default but GitHub's default is creating a discussion in the `announcements` category.
 ```yml
 jobs:
-  process:
+  handle:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       discussion-category-name: announcements
@@ -96,10 +99,11 @@ jobs:
 The workflow does not allow GitHub to generate release notes for empty release names or notes by default. However, the workflow can be configured to allow GitHub to do so.
 ```yml
 jobs:
-  process:
+  handle:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       generate-release-notes: true
@@ -109,10 +113,11 @@ jobs:
 By default, the workflow drafts releases rather than outright publishing them to allow users to review the release before publishing, but also as a simple bypass to `$GITHUB_TOKEN` not being able to trigger other workflows. The behavior can be changed.
 ```yml
 jobs:
-  process:
+  handle:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       draft: false
@@ -122,10 +127,11 @@ jobs:
 Only pull requests with the labeled with `release` are considered release requests. The label can be changed, but only one label can be specified.
 ```yml
 jobs:
-  process:
+  handle:
     name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
+      pull-requests: write
     uses: Arthri/release-request/.github/workflows/release-request.yml
     with:
       release-request-label: custom-label

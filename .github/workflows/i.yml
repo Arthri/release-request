@@ -31,17 +31,17 @@ on:
     outputs:
       release-tag:
         description: The tag of the release.
-        value: ${{ jobs.process.outputs.release-tag }}
+        value: ${{ jobs.handle.outputs.release-tag }}
       release-title:
         description: The title of the release.
-        value: ${{ jobs.process.outputs.release-title }}
+        value: ${{ jobs.handle.outputs.release-title }}
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  process:
+  handle:
     name: ${{ github.event.action == 'closed' && 'Resolve' || 'Verify' }}
     if: ${{ (github.event.pull_request.state != 'closed' || github.event.action == 'closed' && github.event.pull_request.merged) && contains(github.event.pull_request.labels.*.name, inputs.release-request-label) }}
     outputs:
@@ -49,6 +49,7 @@ jobs:
       release-title: ${{ steps.extract.outputs.release-title }}
     permissions:
       contents: write
+      pull-requests: write
     runs-on: ubuntu-22.04
     timeout-minutes: 1
 
@@ -56,17 +57,23 @@ jobs:
       - name: Extract Information
         id: extract
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IS_ACTOR_AUTHORIZED: ${{ github.event.pull_request.author_association == 'OWNER' || github.event.pull_request.author_association == 'COLLABORATOR' }}
           IS_EXTERNAL_REQUEST: ${{ github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           RELEASE_REQUEST_TITLE: ${{ github.event.pull_request.title }}
         run: |
           if [[ $IS_ACTOR_AUTHORIZED != 'true' ]] ; then
-            echo 'Only collaborators or the repository owner may create release requests.'
+            message='Only collaborators or the repository owner may create release requests.'
+            echo "::error::$message"
+            gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             exit 1
           fi
 
           if [[ $IS_EXTERNAL_REQUEST == 'true' ]] ; then
-            echo 'Release requests'"'"' heads must be in the same repository as the bases.'
+            message="Release requests' head branches must be in the same repository as the base branches."
+            echo "::error::$message"
+            gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             exit 1
           fi
 
@@ -76,13 +83,16 @@ jobs:
             echo 'release-tag='"${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
             echo 'release-title='"${BASH_REMATCH[7]}" >> "$GITHUB_OUTPUT"
           else
-            echo 'Release request'"'"'s title is not in the correct format.'
+            message='The release request'"'"'s title is not in the correct format.'
+            echo "::error::$message"
+            gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             exit 1
           fi
 
       - name: Get Release Status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
           RELEASE_TAG: ${{ steps.extract.outputs.release-tag }}
         run: |
           status_code="$(curl -ILs -o /dev/null -w '%{http_code}' \
@@ -94,9 +104,11 @@ jobs:
 
           if [[ $status_code -ne 404 ]] ; then
             if [[ $status_code -eq 200 ]] ; then
-              echo 'A release for the tag "'"$RELEASE_TAG"'" already exists.'
+              message='A release for the tag "'"$RELEASE_TAG"'" already exists.'
+              echo "::error::$message"
+              gh pr comment "$PULL_REQUEST_NUMBER" -b "$message" -R "$GITHUB_REPOSITORY"
             else
-              echo "Unexpected status code $status_code."
+              echo "::error::Unexpected status code $status_code."
             fi
             exit 1
           fi
