@@ -1,5 +1,4 @@
 name: Release Request
-run-name: Release Request
 
 on:
   pull_request:
@@ -13,7 +12,8 @@ on:
       - master
 
 jobs:
-  process:
+  handle:
     permissions:
       contents: write
-    uses: ./.github/workflows/release-request.yml
+      pull-requests: write
+    uses: ./.github/workflows/i.yml
