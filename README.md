@@ -23,7 +23,6 @@ jobs:
       contents: write
       pull-requests: write
     uses: Arthri/release-request/.github/workflows/i.yml@v2
-
 ```
 
 ## Release Request Format
@@ -72,7 +71,6 @@ Here is an example of always setting new releases as the latest release.
 ```yml
 jobs:
   handle:
-    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
       pull-requests: write
@@ -86,7 +84,6 @@ The workflow can be configured to create a discussion when publishing a release,
 ```yml
 jobs:
   handle:
-    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
       pull-requests: write
@@ -100,7 +97,6 @@ The workflow does not allow GitHub to generate release notes for empty release n
 ```yml
 jobs:
   handle:
-    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
       pull-requests: write
@@ -114,7 +110,6 @@ By default, the workflow drafts releases rather than outright publishing them to
 ```yml
 jobs:
   handle:
-    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
       pull-requests: write
@@ -128,7 +123,6 @@ Only pull requests with the labeled with `release` are considered release reques
 ```yml
 jobs:
   handle:
-    name: ${{ github.event.action == 'closed' && 'Resolve ' || 'Verify ' }}Release Request
     permissions:
       contents: write
       pull-requests: write
