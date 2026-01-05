@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: Arthri/release-request/.github/workflows/release-request.yml@v1
+    uses: Arthri/release-request/.github/workflows/i.yml@v2
 
 ```
 
@@ -76,7 +76,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: Arthri/release-request/.github/workflows/release-request.yml
+    uses: Arthri/release-request/.github/workflows/i.yml@v2
     with:
       make-latest: true
 ```
@@ -90,7 +90,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: Arthri/release-request/.github/workflows/release-request.yml
+    uses: Arthri/release-request/.github/workflows/i.yml@v2
     with:
       discussion-category-name: announcements
 ```
@@ -104,7 +104,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: Arthri/release-request/.github/workflows/release-request.yml
+    uses: Arthri/release-request/.github/workflows/i.yml@v2
     with:
       generate-release-notes: true
 ```
@@ -118,7 +118,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: Arthri/release-request/.github/workflows/release-request.yml
+    uses: Arthri/release-request/.github/workflows/i.yml@v2
     with:
       draft: false
 ```
@@ -132,7 +132,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: Arthri/release-request/.github/workflows/release-request.yml
+    uses: Arthri/release-request/.github/workflows/i.yml@v2
     with:
       release-request-label: custom-label
 ```

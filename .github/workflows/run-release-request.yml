@@ -16,4 +16,4 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: ./.github/workflows/release-request.yml
+    uses: ./.github/workflows/i.yml
