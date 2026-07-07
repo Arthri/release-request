@@ -12,7 +12,7 @@
     "lint": "npx eslint .",
     "local-action": "pnpm dlx @github/local-action . src/index.ts .env",
     "package": "npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
-    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
