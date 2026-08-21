@@ -1,5 +1,5 @@
 # release-request
-A reusable workflow that introduces a new type of pull requests, "Release Requests", which create a new release when merged.
+A workflow action which introduces and handles the creation and execution of "release requests," a type of pull requests associated with GitHub Releases.
 
 ## Installation
 Add a new workflow under `.github/workflows/` with the following contents.
@@ -15,14 +15,23 @@ on:
       - opened
       - unlabeled
     branches:
-      - release/**
+      - dev
 
 jobs:
   handle:
     permissions:
       contents: write
       pull-requests: write
-    uses: Arthri/release-request/.github/workflows/i.yml@v2
+    uses: Arthri/release-request/.github/workflows/i.yml@v3
+```
+
+Add the following pull request labels: `release`, `release:major`, `release:minor`, `release:patch`, and `release:prerelease`. A shell script for creating the labels using the GitHub CLI is provided below.
+```sh
+gh label create 'release:major' -c '#D93F0B' -d 'Requests for new major releases containing breaking changes, new features, and/or bugfixes'
+gh label create 'release:minor' -c '#0E8A16' -d 'Requests for new minor releases containing new features and/or bugfixes'
+gh label create 'release:patch' -c '#1D76DB' -d 'Requests for new patch releases containing bugfixes'
+gh label create 'release:prerelease' -c '#D0E20C' -d 'Requests for new prereleases'
+gh label create 'release' -c '#5319e7' -d 'Requests for new releases'
 ```
 
 ## Release Request Format
@@ -36,18 +45,25 @@ The following are all invalid titles.
 - `release v1.2.4` - Invalid capitalization.
 - `Release v1.2.3.4.5` - Too many version fields.
 
-https://regex101.com/r/2H2iOA/ can be used to determine if a title is valid.
+https://regex101.com/r/2H2iOA/4/unit-tests can be used to determine if a title is valid.
 
 Release requests' contents do not currently have a format. Any format is valid.
 
 ## Usage
-1. Create a new pull request with a valid title to any branch that begins with `release/`.
-1. Label the pull request with "release".
-1. Merge pull request.
-1. Expect workflow to run and a new release to be created.
+The intended usage pattern for release requests is as follows, listed step by step,
+1. The release request is created by the user, with the version and type of release specified in the pull request title. The release must be tagged with the `release` label as well as the appropriate sublabel. The pull request body may contain anything. The pull request head branch is commonly `dev`, while the base branch is commonly `master`. Pull request templates for release requests are available in this repository in the `.github` folder.
+1. The release workflow triggers and creates a draft GitHub release.
+1. Optionally, the same workflow may also trigger other jobs for publishing to other platforms, such as NuGet. For the purposes of release requests, publishing to other platforms must succeed before the release request is undrafted and published. If publishing is not successful, users may still edit or push new changes to the pull request head branch to fix any issues with the repository. When publishing to all other platforms succeed, users can move to the next step. GitHub releases are effectively published last, in relation to all other platforms or registries.
+1. The user merges the release request *before* publishing the draft release. The draft release is set to target the base branch by default, which would not contain the new commits before the release request is merged.
+
+The new process introduced in v3 primarily aims to improve integration with immutable GitHub releases. The following benefits are noted,
+- Problems with publishing to other platforms can still be fixed before publishing the GitHub release.
+- Other jobs may modify the GitHub release draft such as to attach changelogs or artifacts before publishing. As of August 21, 2026, GitHub does not push events for creation and modification of draft releases, making it challenging for workflows to trigger on draft releases and modify them before the immutable release is published.
+
+Only owners or collaborators of the repository may create release requests, and the head branch must be in the same repository: that is, release requests cannot be triggered by pull requests from forks.
 
 ### Custom Branches
-The default template sets the release request branches to `release/**`. A different branch glob can be specified, and more than one branch can also be specified.
+The default template sets the release request head branch to `dev`. A different branch glob can be specified, and more than one branch can also be specified.
 
 Here is an example of release requests triggering for branches `release/nuget` and `staging/**`.
 ```yml
@@ -105,19 +121,6 @@ jobs:
       generate-release-notes: true
 ```
 
-### Publish Instead of Draft
-By default, the workflow drafts releases rather than outright publishing them to allow users to review the release before publishing, but also as a simple bypass to `$GITHUB_TOKEN` not being able to trigger other workflows. The behavior can be changed.
-```yml
-jobs:
-  handle:
-    permissions:
-      contents: write
-      pull-requests: write
-    uses: Arthri/release-request/.github/workflows/i.yml@v2
-    with:
-      draft: false
-```
-
 ### Custom Release Request Label
 Only pull requests with the labeled with `release` are considered release requests. The label can be changed, but only one label can be specified.
 ```yml
@@ -130,8 +133,3 @@ jobs:
     with:
       release-request-label: custom-label
 ```
-
-### Limitations
-- Release requests cannot be made from another repository.
-- Release requests must be created by the repository's owner or collaborators.
-- The release request title format is not configurable.

@@ -2,7 +2,6 @@ import * as core from "@actions/core";
 
 export type Config = {
   discussionCategoryName: string;
-  draft: boolean;
   generateReleaseNotes: boolean;
   makeLatest?: "legacy" | "false" | "true";
   releaseRequestLabel: string;
@@ -25,7 +24,6 @@ function getMakeLatest() {
 export function getConfig(): Config {
   return {
     discussionCategoryName: core.getInput("discussion-category-name") ?? "",
-    draft: core.getBooleanInput("draft") ?? true,
     generateReleaseNotes:
       core.getBooleanInput("generate-release-notes") ?? false,
     makeLatest: getMakeLatest(),
