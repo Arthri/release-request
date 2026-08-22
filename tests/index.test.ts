@@ -14,17 +14,20 @@ it("should fail on non-pull request events", async () => {
   await run();
 });
 
-it("should do nothing on closed pull requests", async () => {
-  messages.push({
-    level: "info",
-    content: "Pull request is closed. Nothing to do.",
-  });
-  const restSpy = vi.spyOn(octokit, "rest", "get");
-  payload.pull_request.state = "closed";
-  payload.action = "edited";
-  await run();
-  expect(restSpy).toHaveBeenCalledTimes(0);
-});
+it.for(["edited", "labeled", "unlabeled"] as const)(
+  "should do nothing on closed pull requests",
+  async (action) => {
+    messages.push({
+      level: "info",
+      content: "Pull request is closed. Nothing to do.",
+    });
+    const restSpy = vi.spyOn(octokit, "rest", "get");
+    payload.pull_request.state = "closed";
+    payload.action = action;
+    await run();
+    expect(restSpy).toHaveBeenCalledTimes(0);
+  },
+);
 
 it.for([
   // ["COLLABORATOR", true],
