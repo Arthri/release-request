@@ -14,20 +14,21 @@ function getMakeLatest() {
     makeLatest !== "legacy" &&
     makeLatest !== "true" &&
     makeLatest !== "false" &&
+    makeLatest !== "" &&
     makeLatest !== undefined
   ) {
     throw new Error("Invalid value for make-latest input.");
   }
-  return makeLatest ?? "legacy";
+  return makeLatest || "legacy";
 }
 
 export function getConfig(): Config {
   return {
-    discussionCategoryName: core.getInput("discussion-category-name") ?? "",
+    discussionCategoryName: core.getInput("discussion-category-name") || "",
     generateReleaseNotes:
-      core.getBooleanInput("generate-release-notes") ?? false,
+      core.getBooleanInput("generate-release-notes") || false,
     makeLatest: getMakeLatest(),
-    releaseRequestLabel: core.getInput("release-request-label") ?? "release",
+    releaseRequestLabel: core.getInput("release-request-label") || "release",
     token: core.getInput("token", { required: true }),
   };
 }

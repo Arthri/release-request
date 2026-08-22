@@ -8,8 +8,6 @@ export type Context = {
   event: PullRequestEvent;
   octokit: ReturnType<typeof getOctokit>;
 
-  isMerge: boolean;
-
   error: (message: string) => Promise<never>;
 };
 
@@ -21,8 +19,6 @@ export function getContext(): Context {
     config: config,
     event: event,
     octokit: octokit,
-
-    isMerge: event.action === "closed" && event.pull_request.merged,
 
     error: async (message: string) => {
       await octokit.rest.issues.createComment({

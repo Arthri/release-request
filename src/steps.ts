@@ -5,14 +5,19 @@ import { Context } from "./context.js";
 export async function shouldRun(context: Context) {
   const pullRequest = context.event.pull_request;
   // If pull request is closed and the current action isn't merging the pull request, then do nothing.
-  if (pullRequest.state === "closed" && context.isMerge) {
+  if (
+    pullRequest.state === "closed" &&
+    !(context.event.action === "closed" && context.event.pull_request.merged)
+  ) {
     core.info("Pull request is closed. Nothing to do.");
+    return false;
   } else if (
     !pullRequest.labels.some(
       (l) => l.name === context.config.releaseRequestLabel,
     )
   ) {
     core.info("Pull request is not a release request. Nothing to do.");
+    return false;
   } else if (
     pullRequest.author_association !== "OWNER" &&
     pullRequest.author_association !== "COLLABORATOR"
@@ -30,9 +35,9 @@ export async function shouldRun(context: Context) {
       "Release requests' head branches must be in the same repository as the base branches.",
     );
     throw new Error("Unreachable");
+  } else {
+    return true;
   }
-
-  return true;
 }
 
 type ReleaseInformation = {

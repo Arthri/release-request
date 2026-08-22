@@ -6,14 +6,13 @@ import { getDraftReleaseID, extract, shouldRun } from "./steps.js";
 export async function run() {
   try {
     if (github.context.eventName !== "pull_request") {
-      core.setFailed(
+      throw new Error(
         "Release requests must be triggered by pull request events.",
       );
-      return;
     }
 
     const context = getContext();
-    if (!(await shouldRun(context)) || !context.isMerge) {
+    if (!(await shouldRun(context))) {
       return;
     }
 
