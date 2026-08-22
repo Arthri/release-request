@@ -29,7 +29,19 @@ it.for(["edited", "labeled", "unlabeled"] as const)(
   },
 );
 
+it("should do nothing on pull requests not labeled as release requests", async () => {
+  messages.push({
+    level: "info",
+    content: "Pull request is not a release request. Nothing to do.",
+  });
+  const restSpy = vi.spyOn(octokit, "rest", "get");
+  payload.pull_request.labels.length = 0;
+  await run();
+  expect(restSpy).toHaveBeenCalledTimes(0);
+});
+
 it.for([
+  // TODO
   // ["COLLABORATOR", true],
   // ["OWNER", true],
   ["CONTRIBUTOR", false],
